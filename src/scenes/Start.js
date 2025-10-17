@@ -1,3 +1,5 @@
+import {Projectile} from '../gameobjects/projectile.js';
+
 export class Start extends Phaser.Scene {
 
     constructor() {
@@ -5,14 +7,26 @@ export class Start extends Phaser.Scene {
     }
 
     preload() {
-        // assets
+        // bg assets
         this.load.image('background', 'assets/ocean.png');
         this.load.image('water', 'assets/water.png');
+
+        // object assets
         this.load.image('playerBoat', 'assets/kenney_tiny-battle/Tiles/tile_0177.png')
+        this.load.image('playerProjectile', 'assets/kenney_tiny-battle/Tiles/tile_0198.png');
+
+        // ui assets
+        this.load.image('progressBarEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/slide_horizontal_grey.png');
+        this.load.image('progressMarkFlag', 'assets/kenney_tiny-battle/Tiles/tile_0088.png');
+        this.load.image('progressMarkCircle', 'assets/kenney_ui-pack/PNG/Yellow/Double/icon_outline_circle.png');
 
         // variables for button checks
         this.upPressed = 0;
         this.downPressed = 0;
+
+        // variables for level progress
+        this.levelProgress = 0;
+        this.levelLength = 30000; //measured in milliseconds
     }
 
     create() {
@@ -31,9 +45,15 @@ export class Start extends Phaser.Scene {
         this.player = this.add.sprite(128, height / 2 + 80, 'playerBoat').setScale(3);
         this.player.velocityY = 0;
         this.player.cooldown = 600;
-        this.player.timer = 0;
+        this.player.lastAttack = 0;
+        this.player.hp = 5;
 
         // set UI
+
+        // progress bar
+        this.progressBarEmpty = this.add.sprite(width / 2, 64, 'progressBarEmpty');
+        this.progressMarkFlag = this.add.sprite(width / 2 - 72, 40, 'progressMarkFlag').setScale(2);
+        this.progressMarkCircle = this.add.sprite(width / 2 - 80, 64, 'progressMarkCircle');
     }
 
     update(time, dTime) {
@@ -94,19 +114,18 @@ export class Start extends Phaser.Scene {
         }
 
         // check for projectile input
-        if (this.player.timer <= 0 && this.input.keyboard.addKey('SPACE').isDown)
+        if (time - this.player.lastAttack >= this.player.cooldown && this.input.keyboard.addKey('SPACE').isDown)
         {
             console.log('Bam!'); // needs implementation
-            this.player.timer = this.player.cooldown;
+            this.player.lastAttack = time;
         }
-        if (this.player.timer > 0)
-        {
-            this.player.timer -= dTime;
-        }
-        if (this.player.timer < 0)
-        {
-            this.player.timer = 0;
-        }
+
+        // update UI (progress)
+        this.levelProgress = Math.min((time) / this.levelLength, 1);
+        this.progressMarkFlag.x = 1280 / 2 - 72 + this.levelProgress * 160;
+        this.progressMarkCircle.x = 1280 / 2 - 80 + this.levelProgress * 160;
+
+        // update UI (HP)
     }
     
 }
