@@ -1,4 +1,5 @@
 import { Start } from './scenes/Start.js';
+import { UIScene } from './scenes/uiscene.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -8,9 +9,12 @@ const config = {
     width: 1280,
     height: 720,
     backgroundColor: '#000000',
+    physics: {
+        default: 'arcade'
+    },
     pixelArt: false,
     scene: [
-        Start
+        Start, UIScene
     ],
     scale: {
         mode: Phaser.Scale.FIT,
