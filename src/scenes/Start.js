@@ -28,12 +28,18 @@ export class Start extends Phaser.Scene {
         this.load.image('enemySub', 'assets/kenney_tiny-battle/Tiles/tile_0159.png');
         // this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile');
 
+        // object assets (VFX)
+        this.load.image('explosion', 'assets/kenney_ui-pack/PNG/Red/Default/check_round_color.png');
+
         // variables for button checks
         this.upPressed = 0;
         this.downPressed = 0;
     }
 
     create() {
+        // grab reference to Menu scene
+        let menuScene = this.scene.get('Menu');
+
         // set background tiles
         const {width, height} = this.scale;
         this.backgroundWater = this.add.tileSprite(0, 0, width, height, 'water').setScale(2);
@@ -54,7 +60,7 @@ export class Start extends Phaser.Scene {
         this.player.maxhp = 5;
         this.player.projectileCount = 1;
         this.physics.add.existing(this.player);
-        this.disableControls = false;
+        this.disableControls = true;
         this.iframes = 1200;
         this.damaged = false;
 
@@ -74,7 +80,11 @@ export class Start extends Phaser.Scene {
         // game over flag
         this.gameOver = false;
 
-        this.test = false; //debug
+        menuScene.events.on('startGame', () =>
+        {
+            this.disableControls = false;
+            this.waveStart(30000);
+        }, this);
     }
 
     update(time, dTime) {
@@ -82,13 +92,6 @@ export class Start extends Phaser.Scene {
         this.backgroundFar.tilePositionX += 0.01 * dTime;
         this.backgroundMid.tilePositionX += 0.03 * dTime;
         this.backgroundNear.tilePositionX += 0.07 * dTime;
-
-        //debug
-        if (!this.test && time > 8000)
-        {
-            this.waveStart(30000);
-            this.test = true;
-        }
 
         if (this.gameOver)
         {
@@ -346,6 +349,7 @@ export class Start extends Phaser.Scene {
         this.player.velocityY = 0;
         this.gameOver = true;
         this.events.emit('gameOver');
+        console.log("Game over!"); //debug
     }
 
     // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random'

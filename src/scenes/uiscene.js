@@ -6,10 +6,15 @@ export class UIScene extends Phaser.Scene {
 
     preload() {
         // ui assets
+
+        // hp elements
+        this.load.image('hpFill', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
+        this.load.image('hpEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
+
+        // progress bar
         this.load.image('progressBarEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/slide_horizontal_grey.png');
         this.load.image('progressMarkFlag', 'assets/kenney_tiny-battle/Tiles/tile_0088.png');
         this.load.image('progressMarkCircle', 'assets/kenney_ui-pack/PNG/Yellow/Double/icon_outline_circle.png');
-
     }
 
     create() {
@@ -20,6 +25,12 @@ export class UIScene extends Phaser.Scene {
 
         // hp bar
         this.hp = 5;
+        this.hpBar = [];
+        for (var i = 0; i < this.hp; i++)
+        {
+            let hpTempIcon = this.add.image(48 + 72 * i, 48, 'hpFill');
+            this.hpBar.push(hpTempIcon);
+        }
 
         // progress bar
         this.progressBarEmpty = this.add.sprite(width / 2, 64, 'progressBarEmpty');
@@ -33,7 +44,7 @@ export class UIScene extends Phaser.Scene {
         startScene.events.on('waveStart', (timer) =>
         {
             console.log("Timer: " + timer); // debug
-            this.startCurrentWave(timer);
+            this.time.delayedCall(5000, this.startCurrentWave(timer));
         }, this);
 
         startScene.events.on('loseHP', () =>
@@ -41,6 +52,12 @@ export class UIScene extends Phaser.Scene {
             if (this.hp > 0)
             {
                 this.hp--;
+                this.hpBar[this.hp].setTexture('hpEmpty');
+                this.hpBar[this.hp].setScale(1);
+                if (this.hp <= 0)
+                {
+                    this.gameOver = true;
+                }
             }
         }, this);
 
@@ -48,6 +65,8 @@ export class UIScene extends Phaser.Scene {
         {
             if (this.hp < 5)
             {
+                this.hpBar[this.hp].setTexture('hpFIll');
+                this.hpBar[this.hp - 1].setScale(1);
                 this.hp++;
             }
         }, this);
@@ -59,6 +78,12 @@ export class UIScene extends Phaser.Scene {
     }
 
     update(time, dTime) {
+        // update UI (hp)
+        if (this.hp > 0)
+        {
+            this.hpBar[this.hp - 1].setScale(1.05 + 0.05 * Math.sin(time / 150));
+        }
+
         // update UI (progress)
         if (this.levelStart > 0 && !this.gameOver)
         {

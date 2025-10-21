@@ -1,5 +1,6 @@
 import { Start } from './scenes/Start.js';
 import { UIScene } from './scenes/uiscene.js';
+import { Menu } from './scenes/menu.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -14,7 +15,7 @@ const config = {
     },
     pixelArt: false,
     scene: [
-        Start, UIScene
+        Start, UIScene, Menu
     ],
     scale: {
         mode: Phaser.Scale.FIT,
