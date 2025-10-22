@@ -248,5 +248,5 @@ export class Menu extends Phaser.Scene {
             this.moveMenu = false;
         });
     }
-
+    
 }

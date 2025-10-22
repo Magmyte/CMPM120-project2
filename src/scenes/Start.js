@@ -26,7 +26,7 @@ export class Start extends Phaser.Scene {
         this.load.image('enemyBoat1', 'assets/kenney_tiny-battle/Tiles/tile_0157.png');
         this.load.image('enemyBoat2', 'assets/kenney_tiny-battle/Tiles/tile_0158.png');
         this.load.image('enemySub', 'assets/kenney_tiny-battle/Tiles/tile_0159.png');
-        // this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile');
+        this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile_199');
 
         // object assets (VFX)
         this.load.image('explosion', 'assets/kenney_ui-pack/PNG/Red/Default/check_round_color.png');
@@ -80,10 +80,21 @@ export class Start extends Phaser.Scene {
         // game over flag
         this.gameOver = false;
 
+        // paths for enemies to follow
+
+        // straight line from right to left
+        this.path1 = this.add.path(1350, height / 2 + 80);
+        this.path1.lineTo(-300, height / 2 + 80);
+
+        // starts right, goes left, pause, return right
+        this.path2 = this.add.path(1350, height / 2 + 80);
+        this.path2.lineTo(600, height / 2 + 80);
+        this.path2.lineTo(1350, height / 2 + 80);
+
         menuScene.events.on('startGame', () =>
         {
             this.disableControls = false;
-            this.waveStart(30000);
+            this.waveStart1(180000);
         }, this);
     }
 
@@ -103,20 +114,20 @@ export class Start extends Phaser.Scene {
         }
 
         // check for movement input
-        if (this.disableControls == false && this.upPressed == 0 && (this.input.keyboard.addKey('W').isDown || this.input.keyboard.addKey('UP').isDown))
+        if (!this.disableControls && this.upPressed == 0 && (this.input.keyboard.addKey('W').isDown || this.input.keyboard.addKey('UP').isDown))
         {
             this.upPressed = 1;
         }
-        else if (this.disableControls == false && this.input.keyboard.addKey('W').isUp && this.input.keyboard.addKey('UP').isUp)
+        else if (!this.disableControls && this.input.keyboard.addKey('W').isUp && this.input.keyboard.addKey('UP').isUp)
         {
             this.upPressed = 0;
         }
 
-        if (this.disableControls == false && this.downPressed == 0 && (this.input.keyboard.addKey('S').isDown || this.input.keyboard.addKey('DOWN').isDown))
+        if (!this.disableControls && this.downPressed == 0 && (this.input.keyboard.addKey('S').isDown || this.input.keyboard.addKey('DOWN').isDown))
         {
             this.downPressed = 1;
         }
-        else if (this.disableControls == false && this.input.keyboard.addKey('S').isUp && this.input.keyboard.addKey('DOWN').isUp)
+        else if (!this.disableControls && this.input.keyboard.addKey('S').isUp && this.input.keyboard.addKey('DOWN').isUp)
         {
             this.downPressed = 0;
         }
@@ -154,7 +165,7 @@ export class Start extends Phaser.Scene {
         }
 
         // check for projectile input
-        if (this.disableControls == false && time - this.player.lastAttack >= this.player.cooldown && this.input.keyboard.addKey('SPACE').isDown)
+        if (!this.disableControls && time - this.player.lastAttack >= this.player.cooldown && this.input.keyboard.addKey('SPACE').isDown)
         {
             switch (this.player.projectileCount) {
                 case 2:
@@ -279,7 +290,7 @@ export class Start extends Phaser.Scene {
         // check player + enemy projectile collision
         this.physics.world.overlap(this.player, this.enemyProjectiles, (player, projectile) =>
         {
-            if (this.damaged == false)
+            if (!this.damaged)
             {
                 this.damaged = true;
                 player.hp --;
@@ -299,6 +310,30 @@ export class Start extends Phaser.Scene {
                 }
             }
             projectile.destroy(true);
+        });
+
+        // check player + enemy collision
+        this.physics.world.overlap(this.player, this.enemies, (player, enemy) =>
+        {
+            if (!this.damaged)
+            {
+                this.damaged = true;
+                player.hp--;
+                this.events.emit('loseHP');
+                if (player.hp <= 0 && !this.gameOver)
+                {
+                    this.gameOverFunction();
+                }
+                else
+                {
+                    this.player.tint = 0xff0000;
+                    this.time.delayedCall(this.iframes, () =>
+                    {
+                        this.damaged = false;
+                        this.player.tint = 0xffffff;
+                    });
+                }
+            }
         });
 
         // picking up power ups
@@ -377,10 +412,38 @@ export class Start extends Phaser.Scene {
         this.powerUps.add(powerUp);
     }
 
-    // function to be called whenever a wave starts
-    waveStart(levelLength) {
+    // function to be called when wave 1 starts
+    waveStart1(levelLength) {
+        // random power up
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
-        this.events.emit('waveStart', levelLength);
-        console.log("Start.js has started the save"); // debug
+        this.events.emit('waveStart', levelLength, 1);
+        console.log("Start.js has started wave 1"); // debug
+    }
+
+    // wave 2 function
+    waveStart2(levelLength) {
+        // random power up
+        this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
+        this.events.emit('waveStart', levelLength, 2);
+        console.log("Start.js has started wave 2"); // debug
+    }
+
+    // wave 3 function
+    waveStart3(levelLength) {
+        // random power up
+        this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
+        this.events.emit('waveStart', levelLength, 3);
+        console.log("Start.js has started wave 3"); // debug
+    }
+
+    bossStart() {
+        // random power up
+        this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
+        this.events.emit('bossStart');
+        console.log("Start.js has started boss"); // debug
+    }
+
+    gameComplete() {
+        // to do
     }
 }

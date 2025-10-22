@@ -51,11 +51,68 @@ export class UIScene extends Phaser.Scene {
         this.levelLength = 30000;
         this.gameOver = false;
 
+        // text for wave alert
+        this.waveText = this.add.text(width / 2 - 320, height + 50, 'Wave 1 Starting!');
+        this.waveText.setFontSize(64);
+        this.waveText.moving = false;
+        this.waveText.speed = 100;
+        this.waveText.acceleration = 300;
+        this.waveText.flashing = false;
+        this.waveText.color = false;
+
         // wave start listener
-        startScene.events.on('waveStart', (timer) =>
+        startScene.events.on('waveStart', (timer, waveNum) =>
         {
-            console.log("Timer: " + timer); // debug
-            this.time.delayedCall(5000, this.startCurrentWave(timer));
+            // moving progress flag
+            this.time.delayedCall(5000, this.startCurrentWave(timer - 5000));
+
+            // declaring wave start
+            this.waveText.setText('Wave 1 ' + waveNum + ' Starting!');
+            this.waveText.setFontSize(64);
+
+            this.time.delayedCall(500, () =>
+            {
+                this.waveText.moving = true;
+                this.waveText.flashing = true;
+            });
+
+            this.time.delayedCall(1500, () =>
+            {
+                this.waveText.moving = false;
+                this.waveText.speed = 100;
+            });
+
+            this.time.delayedCall(6000, () =>
+            {
+                this.waveText.flashing = false;
+                this.waveText.y = height + 50;
+            });
+        }, this);
+
+        // boss start listener
+        startScene.events.on('bossStart', () =>
+        {
+            // declaring boss start
+            this.waveText.setText('Incoming Boss!');
+            this.waveText.setFontSize(76);
+
+            this.time.delayedCall(500, () =>
+            {
+                this.waveText.moving = true;
+                this.waveText.flashing = true;
+            });
+
+            this.time.delayedCall(1500, () =>
+            {
+                this.waveText.moving = false;
+                this.waveText.speed = 100;
+            });
+
+            this.time.delayedCall(6000, () =>
+            {
+                this.waveText.flashing = false;
+                this.waveText.y = height + 50;
+            });
         }, this);
 
         // taking damage listener
@@ -111,15 +168,38 @@ export class UIScene extends Phaser.Scene {
             this.progressMarkFlag.x = 1280 / 2 - 72 + this.levelProgress * 160;
             this.progressMarkCircle.x = 1280 / 2 - 80 + this.levelProgress * 160;
         }
+
+        // move wave text
+        if (this.waveText.moving)
+        {
+            this.waveText.y -= this.waveText.speed * dTime / 1000;
+            this.waveText.speed += this.waveText.acceleration * dTime / 1000;
+        }
+
+        // flash wave text color
+        if (this.waveText.flashing && !this.waveText.color)
+        {
+            this.waveText.color = true;
+            this.waveText.setColor('#ff0000');
+            this.time.delayedCall(500, () =>
+            {
+                this.waveText.setColor('#ffffff');
+                this.time.delayedCall(500, () =>
+                {
+                    this.waveText.color = false;
+                });
+            });
+        }
     }
 
+    // update the score after enemy is defeated
     scoreUpdate(scoreValue) {
         this.score += scoreValue;
         this.scoreText.setText("Score: " + this.score);
     }
 
+    // start moving progress bar
     startCurrentWave(levelLength) {
-        console.log("Starting Wave!"); // debug
         this.levelStart = this.time.now;
         this.levelLength = levelLength;
     }
