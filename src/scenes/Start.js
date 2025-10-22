@@ -251,7 +251,7 @@ export class Start extends Phaser.Scene {
                     this.playerProjectiles.add(playerProjectile7_7);
                     break
                 default: // projectileCount == 1
-                    let playerProjectile = new Projectile(this, this.player.x + 24, this.player.y, 'playerProjectile', 0, 150, 300, 60);
+                    let playerProjectile = new Projectile(this, this.player.x + 24, this.player.y, 'playerProjectile', 0, 150, 300);
                     playerProjectile.setScale(1.5);
                     this.playerProjectiles.add(playerProjectile);
             }
