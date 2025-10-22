@@ -264,6 +264,7 @@ export class Start extends Phaser.Scene {
             enemy.hp -= this.player.damage;
             if (enemy.hp <= 0)
             {
+                this.events.emit('scoreAdd', enemy.score);
                 this.enemyPowerCount--;
                 if (this.enemyPowerCount == 0)
                 {
@@ -352,7 +353,7 @@ export class Start extends Phaser.Scene {
         console.log("Game over!"); //debug
     }
 
-    // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random', or 'something or other'
+    // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random'
     generatePowerUp(x, y, powerType) {
         let pickPower = powerType;
         if (powerType == 'random') {

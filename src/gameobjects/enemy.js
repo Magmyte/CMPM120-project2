@@ -1,7 +1,7 @@
 import { Projectile } from "./projectile.js";
 
 export class Enemy extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, sprite, projectileSprite, attCooldown, hp, pathNum) {
+    constructor(scene, x, y, sprite, projectileSprite, attCooldown, hp, pathNum, score) {
         super(scene, x, y, sprite);
         scene.add.existing(this);
         this.scene = scene;
@@ -9,6 +9,7 @@ export class Enemy extends Phaser.GameObjects.Sprite {
         this.cooldown = attCooldown;
         this.hp = hp;
         this.path = pathNum;
+        this.score = score;
     }
 
     preUpdate(time, dTime)

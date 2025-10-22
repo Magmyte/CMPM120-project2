@@ -7,6 +7,9 @@ export class UIScene extends Phaser.Scene {
     preload() {
         // ui assets
 
+        // score elements
+        this.load.image('scoreBG', 'assets/kenney_ui-pack/PNG/Yellow/Double/button_rectangle_border.png');
+
         // hp elements
         this.load.image('hpFill', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
         this.load.image('hpEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
@@ -23,6 +26,13 @@ export class UIScene extends Phaser.Scene {
         // grab reference to Start scene
         let startScene = this.scene.get('Start');
 
+        // score bar
+        this.score = 0;
+        this.scoreBar = this.add.nineslice(1075, 64, 'scoreBG', 0, 500, 120, 16, 16, 16, 16).setScale(0.75);
+        this.scoreText = this.add.text(910, 45, 'Score: ' + this.score);
+        this.scoreText.setFontSize(48);
+        this.scoreText.setColor('#000000');
+
         // hp bar
         this.hp = 5;
         this.hpBar = [];
@@ -33,20 +43,22 @@ export class UIScene extends Phaser.Scene {
         }
 
         // progress bar
-        this.progressBarEmpty = this.add.sprite(width / 2, 64, 'progressBarEmpty');
-        this.progressMarkFlag = this.add.sprite(width / 2 - 72, 40, 'progressMarkFlag').setScale(2);
-        this.progressMarkCircle = this.add.sprite(width / 2 - 80, 64, 'progressMarkCircle');
+        this.progressBarEmpty = this.add.image(width / 2, 64, 'progressBarEmpty');
+        this.progressMarkFlag = this.add.image(width / 2 - 72, 40, 'progressMarkFlag').setScale(2);
+        this.progressMarkCircle = this.add.image(width / 2 - 80, 64, 'progressMarkCircle');
         this.levelStart = -1;
         this.levelProgress = 0;
         this.levelLength = 30000;
         this.gameOver = false;
 
+        // wave start listener
         startScene.events.on('waveStart', (timer) =>
         {
             console.log("Timer: " + timer); // debug
             this.time.delayedCall(5000, this.startCurrentWave(timer));
         }, this);
 
+        // taking damage listener
         startScene.events.on('loseHP', () =>
         {
             if (this.hp > 0)
@@ -61,6 +73,7 @@ export class UIScene extends Phaser.Scene {
             }
         }, this);
 
+        // regaining hp listener
         startScene.events.on('regainHP', () =>
         {
             if (this.hp < 5)
@@ -71,6 +84,13 @@ export class UIScene extends Phaser.Scene {
             }
         }, this);
 
+        // adding score listener
+        startScene.events.on('scoreAdd', (scoreAdd) =>
+        {
+            this.scoreUpdate(scoreAdd);
+        });
+
+        // game over listener
         startScene.events.on('gameOver', () =>
         {
             this.gameOver = true;
@@ -91,6 +111,11 @@ export class UIScene extends Phaser.Scene {
             this.progressMarkFlag.x = 1280 / 2 - 72 + this.levelProgress * 160;
             this.progressMarkCircle.x = 1280 / 2 - 80 + this.levelProgress * 160;
         }
+    }
+
+    scoreUpdate(scoreValue) {
+        this.score += scoreValue;
+        this.scoreText.setText("Score: " + this.score);
     }
 
     startCurrentWave(levelLength) {
