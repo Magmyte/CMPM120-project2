@@ -352,7 +352,7 @@ export class Start extends Phaser.Scene {
         console.log("Game over!"); //debug
     }
 
-    // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random'
+    // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random', or 'something or other'
     generatePowerUp(x, y, powerType) {
         let pickPower = powerType;
         if (powerType == 'random') {
