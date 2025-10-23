@@ -1,5 +1,6 @@
 import {Projectile} from '../gameobjects/projectile.js';
 import {PowerUp} from '../gameobjects/powerup.js';
+import {Enemy} from '../gameobjects/enemy.js';
 
 // import {eventsCenter} from '../eventscenter.js';
 
@@ -26,7 +27,7 @@ export class Start extends Phaser.Scene {
         this.load.image('enemyBoat1', 'assets/kenney_tiny-battle/Tiles/tile_0157.png');
         this.load.image('enemyBoat2', 'assets/kenney_tiny-battle/Tiles/tile_0158.png');
         this.load.image('enemySub', 'assets/kenney_tiny-battle/Tiles/tile_0159.png');
-        this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile_199');
+        this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile_0199.png');
 
         // object assets (VFX)
         this.load.image('explosion', 'assets/kenney_ui-pack/PNG/Red/Default/check_round_color.png');
@@ -52,14 +53,17 @@ export class Start extends Phaser.Scene {
 
         // set player sprite and properties
         this.player = this.add.sprite(128, height / 2 + 80, 'playerBoat').setScale(3);
+        this.physics.add.existing(this.player);
+
+        // these are reset every run
         this.player.velocityY = 0;
         this.player.cooldown = 500;
-        this.player.lastAttack = 0;
         this.player.damage = 3;
         this.player.hp = 5;
         this.player.maxhp = 5;
         this.player.projectileCount = 1;
-        this.physics.add.existing(this.player);
+
+        this.player.lastAttack = 0;
         this.disableControls = true;
         this.iframes = 1200;
         this.damaged = false;
@@ -93,7 +97,7 @@ export class Start extends Phaser.Scene {
 
         menuScene.events.on('startGame', () =>
         {
-            this.disableControls = false;
+            this.init_game();
             this.waveStart1(180000);
         }, this);
     }
@@ -153,9 +157,9 @@ export class Start extends Phaser.Scene {
         this.player.y += this.player.velocityY * dTime;
 
         // limits to player y position
-        if (this.player.y < 230)
+        if (this.player.y < 220)
         {
-            this.player.y = 230;
+            this.player.y = 220;
             this.player.velocityY = 0;
         }
         if (this.player.y > 680)
@@ -284,6 +288,14 @@ export class Start extends Phaser.Scene {
                 }
                 enemy.destroy(true);
             }
+            else
+            {
+                enemy.tint = 0xff0000;
+                this.time.delayedCall(200, () =>
+                {
+                    enemy.tint = 0xffffff;
+                });
+            }
             projectile.destroy(true);
         });
 
@@ -379,10 +391,36 @@ export class Start extends Phaser.Scene {
         });
     }
 
+    // initialize game
+    init_game() {
+        this.disableControls = false;
+        this.damaged = false;
+
+        this.enemies.clear(true, true);
+        this.enemyProjectiles.clear(true, true);
+        this.playerProjectiles.clear(true, true);
+
+        this.player.x = 128;
+        this.player.y = 360 + 80;
+
+        this.player.velocityY = 0;
+        this.player.cooldown = 500;
+        this.player.damage = 3;
+        this.player.hp = 5;
+        this.player.maxhp = 5;
+        this.player.projectileCount = 1;
+
+        this.gameOver = false;
+
+        this.events.emit('scoreReset');
+    }
+
     // check game over state
     gameOverFunction() {
         this.disableControls = true;
         this.player.velocityY = 0;
+        this.upPressed = 0;
+        this.downPressed = 0;
         this.gameOver = true;
         this.events.emit('gameOver');
         console.log("Game over!"); //debug
@@ -418,6 +456,40 @@ export class Start extends Phaser.Scene {
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
         this.events.emit('waveStart', levelLength, 1);
         console.log("Start.js has started wave 1"); // debug
+
+        /* this.time.delayedCall(, () =>
+        {
+
+        }); */
+
+        // let enemy# = new Enemy(this, this.path#, startingX, startingY [440 is half], 'enemySprite#', 'enemyProjectile', firingPattern, firingDelay in ms, hp, score, pathDuration).setScale(-3, 3);
+
+        this.time.delayedCall(6000, () =>
+        {
+            let enemy1 = new Enemy(this, this.path1, 1325, 440 - 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+            this.enemies.add(enemy1);
+
+            let enemy2 = new Enemy(this, this.path1, 1375, 440 + 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+            this.enemies.add(enemy2);
+        });
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(9000 + 800 * i, (i) =>
+            {
+                let enemy3 = new Enemy(this, this.path1, 1350, 400 - 200 + 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+                this.enemies.add(enemy3);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(18000 + 800 * i, (i) =>
+            {
+                let enemy4 = new Enemy(this, this.path1, 1350, 480 + 200 - 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+                this.enemies.add(enemy4);
+            }, [i]);
+        }
     }
 
     // wave 2 function
@@ -445,5 +517,10 @@ export class Start extends Phaser.Scene {
 
     gameComplete() {
         // to do
+        this.disableControls = true;
+        this.player.velocityY = 0;
+        this.upPressed = 0;
+        this.downPressed = 0;
+        this.events.emit('gameComplete');
     }
 }

@@ -34,6 +34,9 @@ export class Menu extends Phaser.Scene {
     create() {
         const {width, height} = this.scale;
 
+        // grab reference to ui scene
+        let uiScene = this.scene.get('UIScene');
+
         // menu group
         this.menuGroup = this.add.group("menuGroup");
 
@@ -107,7 +110,7 @@ export class Menu extends Phaser.Scene {
         {
             this.menuButton.setTexture('startButton');
             this.menuButton.tint = 0xffffff;
-            this.startGame(), this
+            this.startGame();
         });
 
         // flag for checking if game started
@@ -115,6 +118,11 @@ export class Menu extends Phaser.Scene {
         this.moveMenu = true;
         this.speed = 100;
         this.acceleration = 300;
+
+        uiScene.events.on('resetGame', () =>
+        {
+            this.events.emit('startGame');
+        }, this);
     }
 
     update(time, dTime) {
@@ -248,5 +256,4 @@ export class Menu extends Phaser.Scene {
             this.moveMenu = false;
         });
     }
-    
 }

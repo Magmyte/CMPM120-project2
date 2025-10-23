@@ -12,12 +12,16 @@ export class UIScene extends Phaser.Scene {
 
         // hp elements
         this.load.image('hpFill', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
-        this.load.image('hpEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e.png');
+        this.load.image('hpEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/arrow_decorative_e_gray.png');
 
         // progress bar
         this.load.image('progressBarEmpty', 'assets/kenney_ui-pack/PNG/Yellow/Double/slide_horizontal_grey.png');
         this.load.image('progressMarkFlag', 'assets/kenney_tiny-battle/Tiles/tile_0088.png');
         this.load.image('progressMarkCircle', 'assets/kenney_ui-pack/PNG/Yellow/Double/icon_outline_circle.png');
+
+        // restart button
+        this.load.image('restartButton', 'assets/kenney_ui-pack/PNG/Yellow/Double/button_rectangle_depth_flat.png');
+        this.load.image('restartButtonPress', 'assets/kenney_ui-pack/PNG/Yellow/Double/button_rectangle_flat.png');
     }
 
     create() {
@@ -28,10 +32,16 @@ export class UIScene extends Phaser.Scene {
 
         // score bar
         this.score = 0;
-        this.scoreBar = this.add.nineslice(1075, 64, 'scoreBG', 0, 500, 120, 16, 16, 16, 16).setScale(0.75);
-        this.scoreText = this.add.text(910, 45, 'Score: ' + this.score);
-        this.scoreText.setFontSize(48);
+        this.scoreBar = this.add.nineslice(1030, 64, 'scoreBG', 0, 600, 120, 16, 16, 16, 16).setScale(0.75);
+        this.scoreText = this.add.text(830, 45, 'Score: ' + this.score);
+        this.scoreText.setFontSize(45);
         this.scoreText.setColor('#000000');
+
+        // high score
+        this.highScore = 0;
+        this.highScoreText = this.add.text(width / 2 - 170, height / 2 + 10, 'High Score: ' + this.highScore);
+        this.highScoreText.setFontSize(36);
+        this.highScoreText.setVisible(false);
 
         // hp bar
         this.hp = 5;
@@ -60,6 +70,55 @@ export class UIScene extends Phaser.Scene {
         this.waveText.flashing = false;
         this.waveText.color = false;
 
+        // text for game over
+        this.gameOverText = this.add.text(width / 5 - 45, height / 3, 'Game Over!');
+        this.gameOverText.setFontSize(144);
+        this.gameOverText.setVisible(false);
+
+        // text for winning
+        this.winningText = this.add.text(width / 4 - 30, height / 3, 'You Win!');
+        this.winningText.setFontSize(144);
+        this.winningText.setVisible(false);
+
+        this.restartButton = this.add.image(width / 2, height / 2 + 100, 'restartButton').setScale(0.75);
+        this.restartButton.setVisible(false);
+
+        this.restartButton.once('pointerdown', () =>
+        {
+            this.restartButton.setTexture('startButtonPress');
+            this.restartButton.tint = 0xf2cd3a;
+        });
+
+        this.restartButton.once('pointerup', () =>
+        {
+            this.hp = 5;
+            for (var i = 0; i < this.hp; i++)
+            {
+                this.hpBar[i].setTexture('hpFill');
+            }
+
+            this.winningText.setVisible(false);
+            this.gameOverText.setVisible(false);
+            this.restartText.setVisible(false);
+            this.highScoreText.setVisible(false);
+
+            this.restartButton.setTexture('startButton');
+            this.restartButton.tint = 0xffffff;
+            this.restartButton.setVisible(false);
+            this.restartButton.disableInteractive();
+
+            this.progressMarkFlag.x = 640 - 72;
+            this.progressMarkCircle.x = 640 - 80;
+
+            this.events.emit('resetGame');
+        }, this);
+
+        // text for restart prompt
+        this.restartText = this.add.text(width / 3 + 100, height / 2 + 80, 'Restart?');
+        this.restartText.setColor('#000000');
+        this.restartText.setFontSize(48);
+        this.restartText.setVisible(false);
+
         // wave start listener
         startScene.events.on('waveStart', (timer, waveNum) =>
         {
@@ -67,7 +126,7 @@ export class UIScene extends Phaser.Scene {
             this.time.delayedCall(5000, this.startCurrentWave(timer - 5000));
 
             // declaring wave start
-            this.waveText.setText('Wave 1 ' + waveNum + ' Starting!');
+            this.waveText.setText('Wave ' + waveNum + ' Starting!');
             this.waveText.setFontSize(64);
 
             this.time.delayedCall(500, () =>
@@ -125,7 +184,18 @@ export class UIScene extends Phaser.Scene {
                 this.hpBar[this.hp].setScale(1);
                 if (this.hp <= 0)
                 {
+                    if (this.score > this.highScore)
+                    {
+                        this.highScore = this.score;
+                        this.highScoreText.setText('High Score: ' + this.highScore);
+                    }
+                    this.highScoreText.setVisible(true);
+
                     this.gameOver = true;
+                    this.gameOverText.setVisible(true);
+                    this.restartButton.setVisible(true);
+                    this.restartText.setVisible(true);
+                    this.restartButton.setInteractive();
                 }
             }
         }, this);
@@ -147,10 +217,32 @@ export class UIScene extends Phaser.Scene {
             this.scoreUpdate(scoreAdd);
         });
 
+        startScene.events.on('scoreReset', () =>
+        {
+            this.score = 0;
+            this.scoreText.setText("Score: " + this.score);
+        });
+
         // game over listener
         startScene.events.on('gameOver', () =>
         {
             this.gameOver = true;
+        });
+
+        // game complete listener
+        startScene.events.on('gameComplete', () =>
+        {
+            if (this.score > this.highScore)
+            {
+                this.highScore = this.score;
+                this.highScoreText.setText('High Score: ' + this.highScore);
+            }
+            this.highScoreText.setVisible(true);
+
+            this.winningText.setVisible(true);
+            this.restartButton.setVisible(true);
+            this.restartText.setVisible(true);
+            this.restartButton.setInteractive();
         });
     }
 
@@ -202,5 +294,7 @@ export class UIScene extends Phaser.Scene {
     startCurrentWave(levelLength) {
         this.levelStart = this.time.now;
         this.levelLength = levelLength;
+
+        this.gameOver = false;
     }
 }

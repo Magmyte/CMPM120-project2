@@ -41,6 +41,6 @@ export class Projectile extends Phaser.GameObjects.Sprite {
             this.direction -= Math.min(this.homing * dTime / 1000, Phaser.Math.Angle.ShortestBetween(this.direction, targetAngle));
         }
 
-        this.rotation = this.direction + Math.PI;
+        this.rotation = this.direction;
     }
 }

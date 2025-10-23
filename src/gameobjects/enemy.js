@@ -1,24 +1,25 @@
 import { Projectile } from "./projectile.js";
 
-export class Enemy extends Phaser.GameObjects.Pathfollower {
+export class Enemy extends Phaser.GameObjects.PathFollower {
     constructor(scene, path, x, y, sprite, projectileSprite, firePattern, attCooldown, hp, score, pathDuration, delayF, resumeF) {
         super(scene, path, x, y, sprite);
         scene.add.existing(this);
+        scene.physics.add.existing(this);
         this.scene = scene;
         this.path = path;
         this.projectileSprite = projectileSprite;
         this.firePattern = firePattern;
         this.cooldown = attCooldown;
-        this.lastAttack = this.time.now;
+        this.lastAttack = this.scene.time.now;
         this.hp = hp;
         this.score = score;
         this.pathDuration = pathDuration;
-        this.startPath = this.time.now;
+        this.startPath = this.scene.time.now;
         
         this.startFollow({
             duration: this.pathDuration,
             repeat: 1,
-            yoyo: false;
+            yoyo: false,
             rotateToPath: false
         });
 
@@ -50,6 +51,8 @@ export class Enemy extends Phaser.GameObjects.Pathfollower {
         {
             // check for firePattern
             switch (this.firePattern) {
+                case 0: // does not fire
+                    break;
                 case 1: // basic fire forward
                     this.fireProjectile(180, 250, 0);
                     break;
@@ -71,5 +74,6 @@ export class Enemy extends Phaser.GameObjects.Pathfollower {
         let enemyProjectile = new Projectile(this.scene, this.x - 16, this.y, this.projectileSprite, direction, speed, acceleration, homing);
         enemyProjectile.setScale(1.5);
         this.scene.enemyProjectiles.add(enemyProjectile);
+        this.scene.physics.add.existing(enemyProjectile);
     }
 }
