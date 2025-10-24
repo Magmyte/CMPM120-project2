@@ -95,10 +95,14 @@ export class Start extends Phaser.Scene {
         this.path2.lineTo(600, height / 2 + 80);
         this.path2.lineTo(1350, height / 2 + 80);
 
+        // starts right, ends left - boss path
+        this.pathBoss = this.add.path(1400, height / 2 + 80);
+        this.pathBoss.lineTo(1100, height / 2 + 80);
+
         menuScene.events.on('startGame', () =>
         {
             this.init_game();
-            this.waveStart1(180000);
+            this.waveStart1(120000); // length of first wave
         }, this);
     }
 
@@ -313,7 +317,7 @@ export class Start extends Phaser.Scene {
                 }
                 else
                 {
-                    this.player.tint = 0xff000;
+                    this.player.tint = 0xff0000;
                     this.time.delayedCall(this.iframes, () =>
                     {
                         this.damaged = false;
@@ -457,6 +461,11 @@ export class Start extends Phaser.Scene {
         this.events.emit('waveStart', levelLength, 1);
         console.log("Start.js has started wave 1"); // debug
 
+        this.time.delayedCall(levelLength, () =>
+        {
+            this.waveStart2(120000); // length of second wave
+        });
+
         /* this.time.delayedCall(, () =>
         {
 
@@ -490,6 +499,20 @@ export class Start extends Phaser.Scene {
                 this.enemies.add(enemy4);
             }, [i]);
         }
+
+        this.time.delayedCall(24000, () =>
+        {
+            let enemy5 = new Enemy(this, this.path1, 1350, 440 - 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(-3, 3);
+            this.enemies.add(enemy5);
+
+            let enemy6 = new Enemy(this, this.path1, 1350, 440 + 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(-3, 3);
+            this.enemies.add(enemy6);
+        });
+
+        this.time.delayedCall(30000, () =>
+        {
+            
+        });
     }
 
     // wave 2 function

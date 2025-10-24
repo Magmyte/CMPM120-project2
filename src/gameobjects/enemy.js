@@ -14,7 +14,21 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         this.hp = hp;
         this.score = score;
         this.pathDuration = pathDuration;
+        this.destroyTime = pathDuration;
         this.startPath = this.scene.time.now;
+        this.destroyAtEnd = true;
+
+        // account for delay in following path
+        if (delayF > 0)
+        {
+            this.destroyTime += resumeF - delayF;
+        }
+
+        // flag for not destroying self at end of path - used for boss
+        if (delayF == -1)
+        {
+            this.destroyAtEnd = false;
+        }
         
         this.startFollow({
             duration: this.pathDuration,
@@ -23,15 +37,24 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             rotateToPath: false
         });
 
+        // automatically pause follow at delayF ms, resume at resumeF
         if (delayF > 0)
         {
-            this.time.delayedCall(delayF, () =>
+            this.scene.time.delayedCall(delayF, () =>
             {
                 this.pauseFollow();
             });
-            this.time.delayedCall(resumeF, () =>
+            this.scene.time.delayedCall(resumeF, () =>
             {
                 this.resumeFollow();
+            });
+        }
+
+        if (this.destroyAtEnd)
+        {
+            this.scene.time.delayedCall(this.destroyTime, () =>
+            {
+                this.destroy();
             });
         }
     }
@@ -39,12 +62,6 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
     preUpdate(time, dTime)
     {
         super.preUpdate(time, dTime);
-
-        // destroy enemy if it leaves bounds
-        if (time - this.startPath > this.pathDuration)
-        {
-            this.destroy();
-        }
 
         // fire projectile on delay
         if (time - this.lastAttack >= this.cooldown)
