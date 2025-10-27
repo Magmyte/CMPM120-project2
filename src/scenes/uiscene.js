@@ -53,12 +53,15 @@ export class UIScene extends Phaser.Scene {
         }
 
         // progress bar
+        this.pathProgressFlag = this.add.path(width / 2 - 72, 40);
+        this.pathProgressFlag.lineTo(width / 2 - 72 + 160, 40);
+        this.pathProgressCircle = this.add.path(width / 2 - 80, 64);
+        this.pathProgressCircle.lineTo(width / 2 - 80 + 160, 64);
+
         this.progressBarEmpty = this.add.image(width / 2, 64, 'progressBarEmpty');
-        this.progressMarkFlag = this.add.image(width / 2 - 72, 40, 'progressMarkFlag').setScale(2);
-        this.progressMarkCircle = this.add.image(width / 2 - 80, 64, 'progressMarkCircle');
-        this.levelStart = -1;
-        this.levelProgress = 0;
-        this.levelLength = 30000;
+        this.progressMarkFlag = this.add.follower(this.pathProgressFlag, width / 2 - 72, 40, 'progressMarkFlag').setScale(2);
+        this.progressMarkCircle = this.add.follower(this.pathProgressCircle, width / 2 - 80, 64, 'progressMarkCircle');
+        
         this.gameOver = false;
 
         // text for wave alert
@@ -106,6 +109,9 @@ export class UIScene extends Phaser.Scene {
             this.restartButton.tint = 0xffffff;
             this.restartButton.setVisible(false);
             this.restartButton.disableInteractive();
+
+            this.progressMarkFlag.stop();
+            this.progressMarkCircle.stop();
 
             this.progressMarkFlag.x = 640 - 72;
             this.progressMarkCircle.x = 640 - 80;
@@ -205,7 +211,7 @@ export class UIScene extends Phaser.Scene {
         {
             if (this.hp < 5)
             {
-                this.hpBar[this.hp].setTexture('hpFIll');
+                this.hpBar[this.hp].setTexture('hpFill');
                 this.hpBar[this.hp - 1].setScale(1);
                 this.hp++;
             }
@@ -227,6 +233,9 @@ export class UIScene extends Phaser.Scene {
         startScene.events.on('gameOver', () =>
         {
             this.gameOver = true;
+
+            this.progressMarkFlag.pauseFollow();
+            this.progressMarkCircle.pauseFollow();
         });
 
         // game complete listener
@@ -251,14 +260,6 @@ export class UIScene extends Phaser.Scene {
         if (this.hp > 0)
         {
             this.hpBar[this.hp - 1].setScale(1.05 + 0.05 * Math.sin(time / 150));
-        }
-
-        // update UI (progress)
-        if (this.levelStart > 0 && !this.gameOver)
-        {
-            this.levelProgress = Math.min((time - this.levelStart) / this.levelLength, 1);
-            this.progressMarkFlag.x = 1280 / 2 - 72 + this.levelProgress * 160;
-            this.progressMarkCircle.x = 1280 / 2 - 80 + this.levelProgress * 160;
         }
 
         // move wave text
@@ -286,14 +287,34 @@ export class UIScene extends Phaser.Scene {
 
     // update the score after enemy is defeated
     scoreUpdate(scoreValue) {
-        this.score += scoreValue;
+        if (!this.gameOver)
+        {
+            this.score += scoreValue;
+        }
         this.scoreText.setText("Score: " + this.score);
     }
 
     // start moving progress bar
     startCurrentWave(levelLength) {
-        this.levelStart = this.time.now;
-        this.levelLength = levelLength;
+
+        this.time.delayedCall(5000, () =>
+        {
+            this.progressMarkFlag.startFollow({
+                positionOnPath: true,
+                duration: levelLength - 5000,
+                yoyo: false,
+                repeat: 0,
+                rotateToPath: false
+            });
+
+            this.progressMarkCircle.startFollow({
+                positionOnPath: true,
+                duration: levelLength - 5000,
+                yoyo: false,
+                repeat: 0,
+                rotateToPath: false
+            });
+        });
 
         this.gameOver = false;
     }

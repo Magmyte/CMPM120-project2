@@ -51,12 +51,16 @@ export class Menu extends Phaser.Scene {
         this.menuGroup.add(this.menuWater2);
 
         // objects for player demo
-        this.playerDemo1 = this.add.image(width / 3 - 200, height / 2, 'playerBoat').setScale(3);
+        this.playerDemoPath = this.add.path(width / 3 - 200, height / 2);
+        this.playerDemoPath.lineTo(width / 3 - 200, height / 2 - 90);
+        this.playerDemoPath.lineTo(width / 3 - 200, height / 2 + 90);
+        this.playerDemoPath.lineTo(width / 3 - 200, height / 2);
+
+        this.playerDemo1 = this.add.follower(this.playerDemoPath, width / 3 - 200, height / 2, 'playerBoat').setScale(3);
         this.playerDemo2 = this.add.image(width * 2 / 3 - 60, height / 2, 'playerBoat').setScale(3);
         this.menuGroup.add(this.playerDemo1);
         this.menuGroup.add(this.playerDemo2);
 
-        this.playerDemo1.movement = 0;
         this.movementTimer = 2000;
 
         this.playerProjectileDemo1 = this.add.image(-100, -100, 'playerProjectileDemo').setScale(1.5);
@@ -137,12 +141,7 @@ export class Menu extends Phaser.Scene {
         if (!this.started && time >= this.movementTimer)
         {
             this.moveDemo();
-            this.movementTimer += 6000;
-        }
-
-        if (!this.started && this.playerDemo1.movement != 0)
-        {
-            this.playerDemo1.y += this.playerDemo1.movement * dTime;
+            this.movementTimer += 5000;
         }
 
         // projectile demo
@@ -208,7 +207,13 @@ export class Menu extends Phaser.Scene {
         // initial
         this.wDemo.setTexture('wKeyPress');
         this.upDemo.setTexture('upKeyPress');
-        this.playerDemo1.movement = -0.1;
+
+        this.playerDemo1.startFollow({
+            positionOnPath: true,
+            duration: 3200,
+            yoyo: false,
+            rotateToPath: false
+        });
 
         // go down
         this.time.delayedCall(800, () =>
@@ -217,7 +222,6 @@ export class Menu extends Phaser.Scene {
             this.upDemo.setTexture('upKey');
             this.sDemo.setTexture('sKeyPress');
             this.downDemo.setTexture('downKeyPress');
-            this.playerDemo1.movement = 0.1;
         });
 
         // go up again
@@ -227,7 +231,6 @@ export class Menu extends Phaser.Scene {
             this.upDemo.setTexture('upKeyPress');
             this.sDemo.setTexture('sKey');
             this.downDemo.setTexture('downKey');
-            this.playerDemo1.movement = -0.1;
         });
 
         //stop
@@ -235,8 +238,6 @@ export class Menu extends Phaser.Scene {
         {
             this.wDemo.setTexture('wKey');
             this.upDemo.setTexture('upKey');
-            this.playerDemo1.movement = 0;
-            this.playerDemo1.y = 360;
         });
     }
 

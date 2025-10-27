@@ -30,8 +30,9 @@ export class Projectile extends Phaser.GameObjects.Sprite {
         }
     }
 
+    // defunct - doesn't work
     homingTurn(playerX, playerY, dTime) {
-        let targetAngle = Phaser.Math.Angle.Between(this.x, this.y, playerX, playerY);
+        let targetAngle = Math.atan2(playerY - this.y, playerX - this.x);
         if (Phaser.Math.Angle.ShortestBetween(targetAngle, this.direction) < 0)
         {
             this.direction += Math.min(this.homing * dTime / 1000, Phaser.Math.Angle.ShortestBetween(this.direction, targetAngle));

@@ -18,15 +18,16 @@ export class Start extends Phaser.Scene {
         // object assets (player)
         this.load.image('playerBoat', 'assets/kenney_tiny-battle/Tiles/tile_0177.png')
         this.load.image('playerProjectile', 'assets/kenney_tiny-battle/Tiles/tile_0198.png');
-        this.load.image('attSpeedPower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey.png');
-        this.load.image('damagePower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey.png');
-        this.load.image('hpPower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey.png');
-        this.load.image('projectilePower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey.png');
+        this.load.image('attSpeedPower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey_projectile_speed.png');
+        this.load.image('damagePower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey_damage.png');
+        this.load.image('hpPower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey_plus.png');
+        this.load.image('projectilePower', 'assets/kenney_ui-pack/PNG/Yellow/Double/check_square_grey_projectile_plus.png');
 
         // object assets (enemies)
         this.load.image('enemyBoat1', 'assets/kenney_tiny-battle/Tiles/tile_0157.png');
         this.load.image('enemyBoat2', 'assets/kenney_tiny-battle/Tiles/tile_0158.png');
         this.load.image('enemySub', 'assets/kenney_tiny-battle/Tiles/tile_0159.png');
+        this.load.image('enemyPlane', 'assets/kenney_tiny-battle/Tiles/tile_0154.png');
         this.load.image('enemyProjectile', 'assets/kenney_tiny-battle/Tiles/tile_0199.png');
 
         // object assets (VFX)
@@ -95,6 +96,28 @@ export class Start extends Phaser.Scene {
         this.path2.lineTo(600, height / 2 + 80);
         this.path2.lineTo(1350, height / 2 + 80);
 
+        // starts top right, curves down, ends down left
+        this.path3 = this.add.path(1500, height / 2 + 80 - 210);
+        this.path3.lineTo(1100, height / 2 + 80 - 210);
+        this.path3.quadraticBezierTo(900, height / 2 + 80, 1000, height / 2 + 80 - 210);
+        this.path3.quadraticBezierTo(700, height / 2 + 80 + 210, 800, height / 2 + 80 + 210);
+        this.path3.lineTo(-300, height / 2 + 80 + 210);
+
+        // starts down right, curves up, ends up left
+        this.path4 = this.add.path(1500, height / 2 + 80 + 210);
+        this.path4.lineTo(1100, height / 2 + 80 + 210);
+        this.path4.quadraticBezierTo(900, height / 2 + 80, 1000, height / 2 + 80 + 210);
+        this.path4.quadraticBezierTo(700, height / 2 + 80 - 210, 800, height / 2 + 80 - 210);
+        this.path4.lineTo(-300, height / 2 + 80 - 210);
+
+        // starts top right, straight diagonal line down left
+        this.path5 = this.add.path(1500, height / 2 - 210);
+        this.path5.lineTo(-200, height / 2 + 80 + 210);
+
+        // starts down right, straight diagonal line top right
+        this.path6 = this.add.path(1500, height / 2 + 210);
+        this.path6.lineTo(-200, height / 2 + 80 - 210);
+
         // starts right, ends left - boss path
         this.pathBoss = this.add.path(1400, height / 2 + 80);
         this.pathBoss.lineTo(1100, height / 2 + 80);
@@ -102,7 +125,6 @@ export class Start extends Phaser.Scene {
         menuScene.events.on('startGame', () =>
         {
             this.init_game();
-            this.waveStart1(120000); // length of first wave
         }, this);
     }
 
@@ -306,50 +328,14 @@ export class Start extends Phaser.Scene {
         // check player + enemy projectile collision
         this.physics.world.overlap(this.player, this.enemyProjectiles, (player, projectile) =>
         {
-            if (!this.damaged)
-            {
-                this.damaged = true;
-                player.hp --;
-                this.events.emit('loseHP');
-                if (player.hp <= 0 && !this.gameOver)
-                {
-                    this.gameOverFunction();
-                }
-                else
-                {
-                    this.player.tint = 0xff0000;
-                    this.time.delayedCall(this.iframes, () =>
-                    {
-                        this.damaged = false;
-                        this.player.tint = 0xffffff;
-                    });
-                }
-            }
+            this.playerDamaged();
             projectile.destroy(true);
         });
 
         // check player + enemy collision
         this.physics.world.overlap(this.player, this.enemies, (player, enemy) =>
         {
-            if (!this.damaged)
-            {
-                this.damaged = true;
-                player.hp--;
-                this.events.emit('loseHP');
-                if (player.hp <= 0 && !this.gameOver)
-                {
-                    this.gameOverFunction();
-                }
-                else
-                {
-                    this.player.tint = 0xff0000;
-                    this.time.delayedCall(this.iframes, () =>
-                    {
-                        this.damaged = false;
-                        this.player.tint = 0xffffff;
-                    });
-                }
-            }
+            this.playerDamaged();
         });
 
         // picking up power ups
@@ -357,15 +343,13 @@ export class Start extends Phaser.Scene {
         {
             switch (power.power) {
                 case "attSpeed":
-                    console.log("Attack Speed Up");
-                    player.cooldown *= 0.8;
+                    player.cooldown *= 0.9;
                     if (player.cooldown < 150)
                     {
                         player.cooldown = 150;
                     }
                     break;
                 case "damage":
-                    console.log("Damage Up");
                     if (player.damage > 15)
                     {
                         player.damage++;
@@ -376,7 +360,6 @@ export class Start extends Phaser.Scene {
                     }
                     break;
                 case "hp":
-                    console.log("Regained HP");
                     if (player.hp < player.maxhp)
                     {
                         player.hp++;
@@ -384,7 +367,6 @@ export class Start extends Phaser.Scene {
                     }
                     break;
                 case "projectile":
-                    console.log("Projectile Count Up");
                     if (player.projectileCount < 7)
                     {
                         player.projectileCount++;
@@ -393,6 +375,15 @@ export class Start extends Phaser.Scene {
             }
             power.destroy(true);
         });
+
+        // check for homing - defunct, doesn't work
+        /* this.enemyProjectiles.children.each((projectile) =>
+        {
+            if (projectile.homing > 0)
+            {
+                projectile.homingTurn(this.player.x, this.player.y, dTime);
+            }
+        }); */
     }
 
     // initialize game
@@ -403,6 +394,7 @@ export class Start extends Phaser.Scene {
         this.enemies.clear(true, true);
         this.enemyProjectiles.clear(true, true);
         this.playerProjectiles.clear(true, true);
+        this.powerUps.clear(true, true);
 
         this.player.x = 128;
         this.player.y = 360 + 80;
@@ -417,6 +409,10 @@ export class Start extends Phaser.Scene {
         this.gameOver = false;
 
         this.events.emit('scoreReset');
+        this.waveStart1(90000); // length of first wave
+        // this.waveStart2(90000); // testing purposes
+        // this.waveStart3(90000); // testing purposes
+        // this.bossStart(); // testing purposes
     }
 
     // check game over state
@@ -427,7 +423,6 @@ export class Start extends Phaser.Scene {
         this.downPressed = 0;
         this.gameOver = true;
         this.events.emit('gameOver');
-        console.log("Game over!"); //debug
     }
 
     // function to generate a power up - powerType can be 'attSpeed', 'damage', 'hp', 'projectile', or 'random'
@@ -454,16 +449,62 @@ export class Start extends Phaser.Scene {
         this.powerUps.add(powerUp);
     }
 
+    // function to be called when player should be damaged
+    playerDamaged() {
+        if (!this.damaged)
+        {
+            this.damaged = true;
+            this.player.hp--;
+            this.events.emit('loseHP');
+            if (this.player.hp <= 0 && !this.gameOver)
+            {
+                this.gameOverFunction();
+            }
+            else
+            {
+                this.player.tint = 0xff0000;
+                this.tweens.chain({
+                    targets: this.player,
+                    tweens: [{
+                        duration: this.iframes / 10,
+                        ease: "sine",
+                        yoyo: true,
+                        angle: {from: 0, to: 25}
+                        },
+                        {
+                        duration: this.iframes / 10,
+                        ease: "sine",
+                        yoyo: true,
+                        angle: {from: 0, to: -25}
+                        },
+                        {
+                        duration: this.iframes / 10,
+                        ease: "sine",
+                        yoyo: true,
+                        angle: {from: 0, to: 25}
+                        }
+                    ]
+                });
+                this.time.delayedCall(this.iframes, () =>
+                {
+                    this.damaged = false;
+                    this.player.tint = 0xffffff;
+                });
+            }
+        }
+    }
+
     // function to be called when wave 1 starts
     waveStart1(levelLength) {
-        // random power up
-        this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
         this.events.emit('waveStart', levelLength, 1);
         console.log("Start.js has started wave 1"); // debug
 
         this.time.delayedCall(levelLength, () =>
         {
-            this.waveStart2(120000); // length of second wave
+            if (!this.gameOver)
+            {
+                this.waveStart2(60000); // length of second wave
+            }
         });
 
         /* this.time.delayedCall(, () =>
@@ -473,46 +514,106 @@ export class Start extends Phaser.Scene {
 
         // let enemy# = new Enemy(this, this.path#, startingX, startingY [440 is half], 'enemySprite#', 'enemyProjectile', firingPattern, firingDelay in ms, hp, score, pathDuration).setScale(-3, 3);
 
-        this.time.delayedCall(6000, () =>
+        this.time.delayedCall(8000, () =>
         {
-            let enemy1 = new Enemy(this, this.path1, 1325, 440 - 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+            let enemy1 = new Enemy(this, this.path1, 1300, 440 - 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(3);
             this.enemies.add(enemy1);
 
-            let enemy2 = new Enemy(this, this.path1, 1375, 440 + 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+            let enemy2 = new Enemy(this, this.path1, 1400, 440 + 100, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(3);
             this.enemies.add(enemy2);
         });
 
         for (var i = 0; i < 5; i++)
         {
-            this.time.delayedCall(9000 + 800 * i, (i) =>
+            this.time.delayedCall(12000 + 1200 * i, (i) =>
             {
-                let enemy3 = new Enemy(this, this.path1, 1350, 400 - 200 + 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+                let enemy3 = new Enemy(this, this.path1, 1350, 420 - 200 + 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(3);
                 this.enemies.add(enemy3);
             }, [i]);
         }
 
         for (var i = 0; i < 5; i++)
         {
-            this.time.delayedCall(18000 + 800 * i, (i) =>
+            this.time.delayedCall(20000 + 1200 * i, (i) =>
             {
-                let enemy4 = new Enemy(this, this.path1, 1350, 480 + 200 - 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(-3, 3);
+                let enemy4 = new Enemy(this, this.path1, 1350, 460 + 200 - 100 * i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 16000).setScale(3);
                 this.enemies.add(enemy4);
             }, [i]);
         }
 
-        this.time.delayedCall(24000, () =>
+        this.time.delayedCall(30000, () =>
         {
-            let enemy5 = new Enemy(this, this.path1, 1350, 440 - 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(-3, 3);
+            let enemy5 = new Enemy(this, this.path1, 1350, 440 - 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(3);
             this.enemies.add(enemy5);
 
-            let enemy6 = new Enemy(this, this.path1, 1350, 440 + 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(-3, 3);
+            let enemy6 = new Enemy(this, this.path1, 1350, 440 + 150, 'enemyBoat2', 'enemyProjectile', 1, 2000, 15, 20, 16000).setScale(3);
             this.enemies.add(enemy6);
         });
 
-        this.time.delayedCall(30000, () =>
+        this.time.delayedCall(36000, () =>
         {
-            
+            let enemy7 = new Enemy(this, this.path2, 1500, 440 - 50, 'enemyBoat2', 'enemyProjectile', 2, 2000, 15, 20, 10000, 5000, 10000).setScale(3);
+            this.enemies.add(enemy7);
+
+            let enemy8 = new Enemy(this, this.path2, 1500, 440 + 50, 'enemyBoat2', 'enemyProjectile', 2, 2000, 15, 20, 10000, 5000, 10000).setScale(3);
+            this.enemies.add(enemy8);
+
+            this.time.delayedCall(2000, () =>
+            {
+                let enemy9 = new Enemy(this, this.path2, 1650, 440 - 120, 'enemyBoat2', 'enemyProjectile', 2, 2500, 15, 20, 10000, 5000, 10000).setScale(3);
+                this.enemies.add(enemy9);
+
+                let enemy10 = new Enemy(this, this.path2, 1650, 440 + 120, 'enemyBoat2', 'enemyProjectile', 2, 2500, 15, 20, 10000, 5000, 10000).setScale(3);
+                this.enemies.add(enemy10);
+            }, this);
+
+            this.time.delayedCall(4000, () =>
+            {
+                let enemy11 = new Enemy(this, this.path2, 1800, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 3000, 15, 20, 10000, 5000, 10000).setScale(3);
+                this.enemies.add(enemy11);
+
+                let enemy12 = new Enemy(this, this.path2, 1800, 440 + 190, 'enemyBoat2', 'enemyProjectile', 2, 3000, 15, 20, 10000, 5000, 10000).setScale(3);
+                this.enemies.add(enemy12);
+            }, this);
         });
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(48000 + 1200 * i, (i) =>
+            {
+                let enemy13 = new Enemy(this, this.path3, 1400 + 50 * i, 440 - 210, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 10000).setScale(3);
+                this.enemies.add(enemy13);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(55000 + 1200 * i, (i) =>
+            {
+                let enemy14 = new Enemy(this, this.path4, 1400 + 50 * i, 440 + 210, 'enemyBoat1', 'enemyProjectile', 0, 30000, 8, 10, 10000).setScale(3);
+                this.enemies.add(enemy14);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(65000 + 1000 * i, (i) =>
+            {
+                let enemy15 = new Enemy(this, this.path6, 1400 + 50 * i, 440 + 210, 'enemyBoat2', 'enemyProjectile', 3, 3000 + 500 * i, 15, 25, 14000).setScale(3);
+                this.enemies.add(enemy15);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(70000 + 1000 * i, (i) =>
+            {
+                let enemy16 = new Enemy(this, this.path5, 1400 + 50 * i, 440 - 210, 'enemyBoat2', 'enemyProjectile', 3, 3000 + 500 * i, 15, 25, 14000).setScale(3);
+                this.enemies.add(enemy16);
+            }, [i]);
+        }
+
+
     }
 
     // wave 2 function
@@ -521,6 +622,14 @@ export class Start extends Phaser.Scene {
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
         this.events.emit('waveStart', levelLength, 2);
         console.log("Start.js has started wave 2"); // debug
+
+        this.time.delayedCall(levelLength, () =>
+        {
+            if (!this.gameOver)
+            {
+                this.waveStart3(60000); // length of third wave
+            }
+        });
     }
 
     // wave 3 function
@@ -529,6 +638,14 @@ export class Start extends Phaser.Scene {
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
         this.events.emit('waveStart', levelLength, 3);
         console.log("Start.js has started wave 3"); // debug
+
+        this.time.delayedCall(levelLength, () =>
+        {
+            if (!this.gameOver)
+            {
+                this.bossStart();
+            }
+        });
     }
 
     bossStart() {
