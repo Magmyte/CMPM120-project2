@@ -409,8 +409,8 @@ export class Start extends Phaser.Scene {
         this.gameOver = false;
 
         this.events.emit('scoreReset');
-        this.waveStart1(90000); // length of first wave
-        // this.waveStart2(90000); // testing purposes
+        // this.waveStart1(98000); // length of first wave
+        this.waveStart2(90000); // testing purposes
         // this.waveStart3(90000); // testing purposes
         // this.bossStart(); // testing purposes
     }
@@ -503,7 +503,7 @@ export class Start extends Phaser.Scene {
         {
             if (!this.gameOver)
             {
-                this.waveStart2(60000); // length of second wave
+                this.waveStart2(90000); // length of second wave
             }
         });
 
@@ -613,7 +613,29 @@ export class Start extends Phaser.Scene {
             }, [i]);
         }
 
+        this.time.delayedCall(78000, () =>
+        {
+            let enemy17 = new Enemy(this, this.path1, 1400, 440, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
+            this.enemies.add(enemy17);
 
+            this.time.delayedCall(2000, () =>
+            {
+                let enemy18 = new Enemy(this, this.path1, 1400, 440 - 70, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy18);
+
+                let enemy19 = new Enemy(this, this.path1, 1400, 440 + 70, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy19);
+            }, this);
+
+            this.time.delayedCall(4000, () =>
+            {
+                let enemy20 = new Enemy(this, this.path1, 1400, 440 - 140, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy20);
+
+                let enemy21 = new Enemy(this, this.path1, 1400, 440 + 140, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy21);
+            }, this);
+        }, this);
     }
 
     // wave 2 function
@@ -629,7 +651,13 @@ export class Start extends Phaser.Scene {
             {
                 this.waveStart3(60000); // length of third wave
             }
-        });
+        }, this);
+
+        // plane flying out of bounds
+        this.time.delayedCall(1000, () =>
+        {
+            let enemy22 = new Enemy(this, this.path1, 1400, 120, 'enemyPlane', 'enemyProjectile', 0, 30000, 5, 0, 3000).setScale(3);
+        }, this);
     }
 
     // wave 3 function
