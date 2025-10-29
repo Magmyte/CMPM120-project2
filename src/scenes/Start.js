@@ -33,6 +33,10 @@ export class Start extends Phaser.Scene {
         // object assets (VFX)
         this.load.image('explosion', 'assets/kenney_ui-pack/PNG/Red/Default/check_round_color.png');
 
+        // sound assets
+        this.load.audio('playerProjectileSound', 'assets/kenney_interface-sounds/Audio/select_005.ogg');
+        this.load.audio('collisionSound', 'assets/kenney_impact-sounds/Audio/footstep_snow_000.ogg');
+
         // variables for button checks
         this.upPressed = 0;
         this.downPressed = 0;
@@ -55,6 +59,15 @@ export class Start extends Phaser.Scene {
         // set player sprite and properties
         this.player = this.add.sprite(128, height / 2 + 80, 'playerBoat').setScale(3);
         this.physics.add.existing(this.player);
+
+        // set sounds
+        this.playerProjectileSound = this.sound.add('playerProjectileSound');
+        this.playerProjectileSound.setVolume(0.2);
+        this.playerProjectileSound.setRate(0.2);
+
+        this.collisionSound = this.sound.add('collisionSound');
+        this.collisionSound.setVolume(0.4);
+        this.collisionSound.setRate(0.5);
 
         // these are reset every run
         this.player.velocityY = 0;
@@ -304,12 +317,13 @@ export class Start extends Phaser.Scene {
                     let playerProjectile7_7 = new Projectile(this, this.player.x + 24, this.player.y, 'playerProjectile', 0, 150, 300);
                     playerProjectile7_7.setScale(1.5);
                     this.playerProjectiles.add(playerProjectile7_7);
-                    break
+                    break;
                 default: // projectileCount == 1
                     let playerProjectile = new Projectile(this, this.player.x + 24, this.player.y, 'playerProjectile', 0, 150, 300);
                     playerProjectile.setScale(1.5);
                     this.playerProjectiles.add(playerProjectile);
             }
+            this.playerProjectileSound.play();
             this.player.lastAttack = time;
         }
 
@@ -317,6 +331,8 @@ export class Start extends Phaser.Scene {
         this.physics.world.overlap(this.playerProjectiles, this.enemies, (projectile, enemy) =>
         {
             enemy.hp -= this.player.damage;
+            this.collisionSound.play();
+
             if (enemy.hp <= 0)
             {
                 this.events.emit('scoreAdd', enemy.score);
@@ -470,6 +486,8 @@ export class Start extends Phaser.Scene {
             this.damaged = true;
             this.player.hp--;
             this.events.emit('loseHP');
+            this.collisionSound.play();
+
             if (this.player.hp <= 0 && !this.gameOver)
             {
                 this.gameOverFunction();
@@ -519,14 +537,14 @@ export class Start extends Phaser.Scene {
             {
                 this.waveStart2(90000); // length of second wave
             }
-        });
+        }, this);
 
         /* this.time.delayedCall(, () =>
         {
 
         }); */
 
-        // let enemy# = new Enemy(this, this.path#, startingX, startingY [440 is half], 'enemySprite#', 'enemyProjectile', firingPattern, firingDelay in ms, hp, score, pathDuration).setScale(-3, 3);
+        // let enemy# = new Enemy(this, this.path#, startingX, startingY [440 is half], 'enemySprite#', 'enemyProjectile', firingPattern, firingDelay in ms, hp, score, pathDuration).setScale(3);
 
         this.time.delayedCall(8000, () =>
         {
@@ -579,7 +597,7 @@ export class Start extends Phaser.Scene {
 
                 let enemy10 = new Enemy(this, this.path2, 1650, 440 + 120, 'enemyBoat2', 'enemyProjectile', 2, 2500, 15, 20, 10000, 5000, 10000).setScale(3);
                 this.enemies.add(enemy10);
-            }, this);
+            });
 
             this.time.delayedCall(4000, () =>
             {
@@ -588,7 +606,7 @@ export class Start extends Phaser.Scene {
 
                 let enemy12 = new Enemy(this, this.path2, 1800, 440 + 190, 'enemyBoat2', 'enemyProjectile', 2, 3000, 15, 20, 10000, 5000, 10000).setScale(3);
                 this.enemies.add(enemy12);
-            }, this);
+            });
         });
 
         for (var i = 0; i < 5; i++)
@@ -639,7 +657,7 @@ export class Start extends Phaser.Scene {
 
                 let enemy19 = new Enemy(this, this.path1, 1400, 440 + 70, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
                 this.enemies.add(enemy19);
-            }, this);
+            });
 
             this.time.delayedCall(4000, () =>
             {
@@ -648,7 +666,7 @@ export class Start extends Phaser.Scene {
 
                 let enemy21 = new Enemy(this, this.path1, 1400, 440 + 140, 'enemyBoat2', 'enemyProjectile', 5, 3000, 20, 30, 16000).setScale(3);
                 this.enemies.add(enemy21);
-            }, this);
+            });
         }, this);
     }
 
@@ -671,6 +689,29 @@ export class Start extends Phaser.Scene {
         this.time.delayedCall(1000, () =>
         {
             let enemy22 = new Enemy(this, this.path1, 1400, 120, 'enemyPlane', 'enemyProjectile', 0, 30000, 5, 0, 3000).setScale(3);
+        }, this);
+
+        this.time.delayedCall(4000, () =>
+        {
+            let enemy23 = new Enemy(this, this.path7, 1900, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000 + 1000, 16000).setScale(3);
+            this.enemies.add(enemy23);
+
+            this.time.delayedCall(800, () =>
+            {
+                let enemy24 = new Enemy(this, this.path7, 2000, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000, 16000).setScale(3);
+                this.enemies.add(enemy24);
+            });
+
+            this.time.delayedCall(1600, () =>
+            {
+                let enemy25 = new Enemy(this, this.path7, 2100, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000 - 1000, 16000).setScale(3);
+                this.enemies.add(enemy25);
+            });
+        }, this);
+
+        this.time.delayedCall(20000, () =>
+        {
+
         }, this);
     }
 

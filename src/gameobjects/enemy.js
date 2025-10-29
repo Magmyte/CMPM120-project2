@@ -18,7 +18,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         this.startPath = this.scene.time.now;
         this.destroyAtEnd = true;
 
-        // account for delay in following path
+        // account for delay in following path - resumeF is time after start
         if (delayF > 0)
         {
             this.destroyTime += resumeF - delayF;
@@ -57,6 +57,12 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                 this.destroy();
             }, this);
         }
+
+        // enemy projectile sound
+        /* this.scene.load.audio('enemyProjectileSound', 'assets/kenney_interface-sounds/Audio/error_006.ogg');
+        this.enemyProjectileSound = this.scene.sound.add('enemyProjectileSound');
+        this.enemyProjectileSound.setVolume(0.3);
+        this.enemyProjectileSound.setRate(0.2); */
     }
 
     preUpdate(time, dTime)
@@ -78,6 +84,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                     this.scene.time.delayedCall(200, () =>
                     {
                         this.fireProjectile(180, 250, 100);
+                        // this.enemyProjectileSound.play();
                     }, this);
                     break;
                 case 3: // v shot
@@ -91,6 +98,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                     {
                         this.fireProjectile(165, 250, 100);
                         this.fireProjectile(195, 250, 100);
+                        // this.enemyProjectileSound.play();
                     }, this);
                     break;
                 case 5: // tri shot
@@ -107,11 +115,13 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                         this.fireProjectile(165, 250, 100);
                         this.fireProjectile(180, 250, 100);
                         this.fireProjectile(195, 250, 100);
+                        // this.enemyProjectileSound.play();
                     }, this);
                     break;
                 default:
                     console.log("Oops, this enemy's projectile broke."); // debug
             }
+            // this.enemyProjectileSound.play();
             this.lastAttack = time;
         }
     }
