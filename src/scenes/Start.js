@@ -118,6 +118,20 @@ export class Start extends Phaser.Scene {
         this.path6 = this.add.path(1500, height / 2 + 210);
         this.path6.lineTo(-200, height / 2 + 80 - 210);
 
+        // starts top right, goes left, then down, then right
+        this.path7 = this.add.path(1600, height / 2 + 80 - 180);
+        this.path7.lineTo(780, height / 2 + 80 - 180);
+        this.path7.quadraticBezierTo(600, height / 2 + 80, 600, height / 2 + 80 - 180);
+        this.path7.quadraticBezierTo(780, height / 2 + 80 + 180, 600, height / 2 + 80 + 180);
+        this.path7.lineTo(1600, height / 2 + 80 + 180);
+
+        // starts down right, goes left, then up, then right
+        this.path8 = this.add.path(1600, height / 2 + 80 + 180);
+        this.path8.lineTo(780, height / 2 + 80 + 180);
+        this.path8.quadraticBezierTo(600, height / 2 + 80, 600, height / 2 + 80 + 180);
+        this.path8.quadraticBezierTo(780, height / 2 + 80 - 180, 600, height / 2 + 80 - 180);
+        this.path8.lineTo(1600, height / 2 + 80 - 180);
+
         // starts right, ends left - boss path
         this.pathBoss = this.add.path(1400, height / 2 + 80);
         this.pathBoss.lineTo(1100, height / 2 + 80);
