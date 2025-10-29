@@ -26,12 +26,12 @@ export class Projectile extends Phaser.GameObjects.Sprite {
 
         if (this.x < -100 || this.x > 1380 || this.y < 190 || this.y > 820)
         {
-            this.destroy();
+            this.destroy(true);
         }
     }
 
     // defunct - doesn't work
-    homingTurn(playerX, playerY, dTime) {
+    /* homingTurn(playerX, playerY, dTime) {
         let targetAngle = Math.atan2(playerY - this.y, playerX - this.x);
         if (Phaser.Math.Angle.ShortestBetween(targetAngle, this.direction) < 0)
         {
@@ -43,5 +43,5 @@ export class Projectile extends Phaser.GameObjects.Sprite {
         }
 
         this.rotation = this.direction;
-    }
+    } */
 }

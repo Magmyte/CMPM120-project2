@@ -355,7 +355,7 @@ export class Start extends Phaser.Scene {
                 this.time.delayedCall(200, () =>
                 {
                     enemy.tint = 0xffffff;
-                });
+                }, this);
             }
             projectile.destroy(true);
         });
@@ -526,7 +526,7 @@ export class Start extends Phaser.Scene {
                 {
                     this.damaged = false;
                     this.player.tint = 0xffffff;
-                });
+                }, this);
             }
         }
     }
@@ -686,7 +686,8 @@ export class Start extends Phaser.Scene {
         {
             if (!this.gameOver)
             {
-                this.waveStart3(60000); // length of third wave
+                // this.waveStart3(60000); // length of third wave
+                this.gameComplete();
             }
         }, this);
 
@@ -718,7 +719,7 @@ export class Start extends Phaser.Scene {
         {
             this.time.delayedCall(20000 + 1600 * i, (i) =>
             {
-                let enemy26 = new Enemy(this, this.path4, 1600 - 60 * i, 440 + 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 12000).setScale(3);
+                let enemy26 = new Enemy(this, this.path4, 1600 - 70 * i, 440 + 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 12000).setScale(3);
                 this.enemies.add(enemy26);
             }, [i]);
         }
@@ -732,7 +733,7 @@ export class Start extends Phaser.Scene {
             }, [i]);
         }
 
-        for (var i = 0; i < 3; i++)
+        /* for (var i = 0; i < 3; i++)
         {
             this.time.delayedCall(36000 + 2500 * i, (i) =>
             {
@@ -740,9 +741,27 @@ export class Start extends Phaser.Scene {
                 this.enemies.add(enemy27);
             }, [i]);
         }
+
+        for (var i = 0; i < 6; i++)
+        {
+            this.time.delayedCall(44000 + 1500 * i, (i) =>
+            {
+                let enemy28 = new Enemy(this, this.path3, 1600 - 70 * i, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 12000).setScale(3);
+                this.enemies.add(enemy28);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 3; i++)
+        {
+            this.time.delayedCall(49000 + 2500 * i, (i) =>
+            {
+                let enemy29 = new Enemy(this, this.path5, 1400, 440 - 300 - 200 * i, 'enemyPlane', 'enemyProjectile', 0, 30000, 20, 40, 5000).setScale(3);
+                this.enemies.add(enemy29);
+            }, [i]);
+        } */
     }
 
-    // wave 3 function
+    // wave 3 function - incomplete
     waveStart3(levelLength) {
         // random power up
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');
@@ -758,6 +777,7 @@ export class Start extends Phaser.Scene {
         });
     }
 
+    // incomplete
     bossStart() {
         // random power up
         this.generatePowerUp(1380, 405 + 100 * Math.random(), 'random');

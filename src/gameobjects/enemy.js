@@ -43,19 +43,19 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
             this.scene.time.delayedCall(delayF, () =>
             {
                 this.pauseFollow();
-            }, this);
+            }, this.scene);
             this.scene.time.delayedCall(resumeF, () =>
             {
                 this.resumeFollow();
-            }, this);
+            }, this.scene);
         }
 
         if (this.destroyAtEnd)
         {
             this.scene.time.delayedCall(this.destroyTime, () =>
             {
-                this.destroy();
-            }, this);
+                this.destroy(true);
+            }, this.scene);
         }
 
         // enemy projectile sound
@@ -85,7 +85,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                     {
                         this.fireProjectile(180, 250, 100);
                         // this.enemyProjectileSound.play();
-                    }, this);
+                    }, this.scene);
                     break;
                 case 3: // v shot
                     this.fireProjectile(165, 250, 100);
@@ -99,7 +99,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                         this.fireProjectile(165, 250, 100);
                         this.fireProjectile(195, 250, 100);
                         // this.enemyProjectileSound.play();
-                    }, this);
+                    }, this.scene);
                     break;
                 case 5: // tri shot
                     this.fireProjectile(165, 250, 100);
@@ -116,7 +116,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                         this.fireProjectile(180, 250, 100);
                         this.fireProjectile(195, 250, 100);
                         // this.enemyProjectileSound.play();
-                    }, this);
+                    }, this.scene);
                     break;
                 default:
                     console.log("Oops, this enemy's projectile broke."); // debug

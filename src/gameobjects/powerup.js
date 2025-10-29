@@ -3,6 +3,7 @@ export class PowerUp extends Phaser.GameObjects.Sprite {
         super(scene, x, y, sprite);
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.scene = scene;
         this.power = powerType; // power types should be 'attSpeed', 'damage', 'hp', or 'projectile'
         this.timeStart = timeStart;
     }
@@ -14,7 +15,7 @@ export class PowerUp extends Phaser.GameObjects.Sprite {
 
         if (this.x < -100)
         {
-            this.destroy();
+            this.destroy(true);
         }
     }
 }

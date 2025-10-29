@@ -229,7 +229,7 @@ export class Menu extends Phaser.Scene {
             this.upDemo.setTexture('upKey');
             this.sDemo.setTexture('sKeyPress');
             this.downDemo.setTexture('downKeyPress');
-        });
+        }, this);
 
         // go up again
         this.time.delayedCall(3 * 800, () =>
@@ -238,14 +238,14 @@ export class Menu extends Phaser.Scene {
             this.upDemo.setTexture('upKeyPress');
             this.sDemo.setTexture('sKey');
             this.downDemo.setTexture('downKey');
-        });
+        }, this);
 
         //stop
         this.time.delayedCall(4 * 800, () =>
         {
             this.wDemo.setTexture('wKey');
             this.upDemo.setTexture('upKey');
-        });
+        }, this);
     }
 
     startGame() {
@@ -256,12 +256,12 @@ export class Menu extends Phaser.Scene {
             this.time.delayedCall(3000, () =>
             {
                 this.events.emit('startGame');
-            })
+            }, this)
         }
         this.started = true;
         this.time.delayedCall(4000, () =>
         {
             this.moveMenu = false;
-        });
+        }, this);
     }
 }

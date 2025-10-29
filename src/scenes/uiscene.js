@@ -228,13 +228,13 @@ export class UIScene extends Phaser.Scene {
         startScene.events.on('scoreAdd', (scoreAdd) =>
         {
             this.scoreUpdate(scoreAdd);
-        });
+        }, this);
 
         startScene.events.on('scoreReset', () =>
         {
             this.score = 0;
             this.scoreText.setText("Score: " + this.score);
-        });
+        }, this);
 
         // game over listener
         startScene.events.on('gameOver', () =>
@@ -243,7 +243,7 @@ export class UIScene extends Phaser.Scene {
 
             this.progressMarkFlag.pauseFollow();
             this.progressMarkCircle.pauseFollow();
-        });
+        }, this);
 
         // game complete listener
         startScene.events.on('gameComplete', () =>
@@ -259,7 +259,7 @@ export class UIScene extends Phaser.Scene {
             this.restartButton.setVisible(true);
             this.restartText.setVisible(true);
             this.restartButton.setInteractive();
-        });
+        }, this);
     }
 
     update(time, dTime) {
