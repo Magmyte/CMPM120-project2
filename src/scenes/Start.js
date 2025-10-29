@@ -36,6 +36,7 @@ export class Start extends Phaser.Scene {
         // sound assets
         this.load.audio('playerProjectileSound', 'assets/kenney_interface-sounds/Audio/select_005.ogg');
         this.load.audio('collisionSound', 'assets/kenney_impact-sounds/Audio/footstep_snow_000.ogg');
+        this.load.audio('scoreSound', 'assets/kenney_interface-sounds/Audio/maximize_007.ogg');
 
         // variables for button checks
         this.upPressed = 0;
@@ -68,6 +69,9 @@ export class Start extends Phaser.Scene {
         this.collisionSound = this.sound.add('collisionSound');
         this.collisionSound.setVolume(0.4);
         this.collisionSound.setRate(0.5);
+
+        this.scoreSound = this.sound.add('scoreSound');
+        this.scoreSound.setVolume(0.5);
 
         // these are reset every run
         this.player.velocityY = 0;
@@ -342,6 +346,7 @@ export class Start extends Phaser.Scene {
                     this.generatePowerUp(enemy.x, enemy.y, 'random');
                     this.enemyPowerCount = 5;
                 }
+                this.scoreSound.play();
                 enemy.destroy(true);
             }
             else
@@ -709,10 +714,32 @@ export class Start extends Phaser.Scene {
             });
         }, this);
 
-        this.time.delayedCall(20000, () =>
+        for (var i = 0; i < 5; i++)
         {
+            this.time.delayedCall(20000 + 1600 * i, (i) =>
+            {
+                let enemy26 = new Enemy(this, this.path4, 1600 - 60 * i, 440 + 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 12000).setScale(3);
+                this.enemies.add(enemy26);
+            }, [i]);
+        }
 
-        }, this);
+        for (var i = 0; i < 5; i++)
+        {
+            this.time.delayedCall(27500 + 1600 * i, (i) =>
+            {
+                let enemy26 = new Enemy(this, this.path5, 1400, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 10000).setScale(3);
+                this.enemies.add(enemy26);
+            }, [i]);
+        }
+
+        for (var i = 0; i < 3; i++)
+        {
+            this.time.delayedCall(36000 + 2500 * i, (i) =>
+            {
+                let enemy27 = new Enemy(this, this.path6, 1400, 440 - 200 + 200 * i, 'enemyPlane', 'enemyProjectile', 0, 30000, 20, 40, 5000).setScale(3);
+                this.enemies.add(enemy27);
+            }, [i]);
+        }
     }
 
     // wave 3 function

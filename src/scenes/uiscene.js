@@ -22,6 +22,9 @@ export class UIScene extends Phaser.Scene {
         // restart button
         this.load.image('restartButton', 'assets/kenney_ui-pack/PNG/Yellow/Double/button_rectangle_depth_flat.png');
         this.load.image('restartButtonPress', 'assets/kenney_ui-pack/PNG/Yellow/Double/button_rectangle_flat.png');
+
+        // click sound
+        this.load.audio('clickSound', 'assets/kenney_interface-sounds/Audio/click_002.ogg');
     }
 
     create() {
@@ -86,10 +89,14 @@ export class UIScene extends Phaser.Scene {
         this.restartButton = this.add.image(width / 2, height / 2 + 100, 'restartButton').setScale(0.75);
         this.restartButton.setVisible(false);
 
+        this.clickSound = this.sound.add('clickSound');
+        this.clickSound.setVolume(0.5);
+
         this.restartButton.once('pointerdown', () =>
         {
             this.restartButton.setTexture('startButtonPress');
             this.restartButton.tint = 0xf2cd3a;
+            this.clickSound.play();
         });
 
         this.restartButton.once('pointerup', () =>

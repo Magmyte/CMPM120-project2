@@ -29,6 +29,9 @@ export class Menu extends Phaser.Scene {
         this.load.image('downKeyPress', 'assets/kenney_input-prompts_1.4/Keyboard & Mouse/Double/keyboard_arrow_down_outline.png');
         this.load.image('spaceBar', 'assets/kenney_input-prompts_1.4/Keyboard & Mouse/Double/keyboard_space.png');
         this.load.image('spaceBarPress', 'assets/kenney_input-prompts_1.4/Keyboard & Mouse/Double/keyboard_space_outline.png');
+
+        // click sound
+        this.load.audio('clickSound', 'assets/kenney_interface-sounds/Audio/click_002.ogg');
     }
 
     create() {
@@ -91,6 +94,9 @@ export class Menu extends Phaser.Scene {
         this.menuButton.setInteractive();
         this.menuGroup.add(this.menuButton);
 
+        this.clickSound = this.sound.add('clickSound');
+        this.clickSound.setVolume(0.5);
+
         // text boxes
         this.header = this.add.text(width / 2 - 200, height / 6 - 40, 'Ready?');
         this.header.setAlign('center');
@@ -108,6 +114,7 @@ export class Menu extends Phaser.Scene {
         {
             this.menuButton.setTexture('startButtonPress');
             this.menuButton.tint = 0xf2cd3a;
+            this.clickSound.play();
         });
 
         this.menuButton.once('pointerup', () =>
