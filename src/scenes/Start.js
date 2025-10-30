@@ -444,8 +444,8 @@ export class Start extends Phaser.Scene {
         this.gameOver = false;
 
         this.events.emit('scoreReset');
-        // this.waveStart1(98000); // length of first wave
-        this.waveStart2(90000); // testing purposes
+        this.waveStart1(98000); // length of first wave
+        // this.waveStart2(102000); // testing purposes
         // this.waveStart3(90000); // testing purposes
         // this.bossStart(); // testing purposes
     }
@@ -540,7 +540,7 @@ export class Start extends Phaser.Scene {
         {
             if (!this.gameOver)
             {
-                this.waveStart2(90000); // length of second wave
+                this.waveStart2(102000); // length of second wave
             }
         }, this);
 
@@ -699,18 +699,18 @@ export class Start extends Phaser.Scene {
 
         this.time.delayedCall(4000, () =>
         {
-            let enemy23 = new Enemy(this, this.path7, 1900, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000 + 1000, 16000).setScale(3);
+            let enemy23 = new Enemy(this, this.path7, 1900, 440 - 180, 'enemySub', 'enemyProjectile', 6, 3900, 30, 50, 16000, 8000 + 1000, 16000).setScale(3);
             this.enemies.add(enemy23);
 
             this.time.delayedCall(800, () =>
             {
-                let enemy24 = new Enemy(this, this.path7, 2000, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000, 16000).setScale(3);
+                let enemy24 = new Enemy(this, this.path7, 2000, 440 - 180, 'enemySub', 'enemyProjectile', 6, 3900, 30, 50, 16000, 8000, 16000).setScale(3);
                 this.enemies.add(enemy24);
             });
 
             this.time.delayedCall(1600, () =>
             {
-                let enemy25 = new Enemy(this, this.path7, 2100, 440 - 180, 'enemySub', 'enemyProjectile', 6, 4000, 30, 50, 16000, 8000 - 1000, 16000).setScale(3);
+                let enemy25 = new Enemy(this, this.path7, 2100, 440 - 180, 'enemySub', 'enemyProjectile', 6, 3900, 30, 50, 16000, 8000 - 1000, 16000).setScale(3);
                 this.enemies.add(enemy25);
             });
         }, this);
@@ -728,12 +728,12 @@ export class Start extends Phaser.Scene {
         {
             this.time.delayedCall(27500 + 1600 * i, (i) =>
             {
-                let enemy26 = new Enemy(this, this.path5, 1400, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 10000).setScale(3);
+                let enemy26 = new Enemy(this, this.path5, 1400, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2050 + 300 * i, 20, 30, 10000).setScale(3);
                 this.enemies.add(enemy26);
             }, [i]);
         }
 
-        /* for (var i = 0; i < 3; i++)
+        for (var i = 0; i < 3; i++)
         {
             this.time.delayedCall(36000 + 2500 * i, (i) =>
             {
@@ -744,21 +744,84 @@ export class Start extends Phaser.Scene {
 
         for (var i = 0; i < 6; i++)
         {
-            this.time.delayedCall(44000 + 1500 * i, (i) =>
+            this.time.delayedCall(41000 + 1500 * i, (i) =>
             {
-                let enemy28 = new Enemy(this, this.path3, 1600 - 70 * i, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2000 + 300 * i, 20, 30, 12000).setScale(3);
+                let enemy28 = new Enemy(this, this.path3, 1600 - 70 * i, 440 - 190, 'enemyBoat2', 'enemyProjectile', 2, 2050 + 300 * i, 20, 30, 12000).setScale(3);
                 this.enemies.add(enemy28);
             }, [i]);
         }
 
         for (var i = 0; i < 3; i++)
         {
-            this.time.delayedCall(49000 + 2500 * i, (i) =>
+            this.time.delayedCall(52000 + 2500 * i, (i) =>
             {
-                let enemy29 = new Enemy(this, this.path5, 1400, 440 - 300 - 200 * i, 'enemyPlane', 'enemyProjectile', 0, 30000, 20, 40, 5000).setScale(3);
+                let enemy29 = new Enemy(this, this.path5, 1400, 440 - 270 + 150 * i, 'enemyPlane', 'enemyProjectile', 0, 30000, 20, 40, 5000).setScale(3);
                 this.enemies.add(enemy29);
             }, [i]);
-        } */
+        }
+
+        for (var i = 0; i < 6; i++)
+        {
+            this.time.delayedCall(56000 + 1000 * i, (i) =>
+            {
+                let enemy30 = new Enemy(this, this.path1, 1500, 440 - 50 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy30);
+
+                let enemy31 = new Enemy(this, this.path1, 1500, 440 + 50 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                this.enemies.add(enemy31);
+
+                this.time.delayedCall(3500, () =>
+                {
+                    let enemy32 = new Enemy(this, this.path1, 1500, 440 - 120 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                    this.enemies.add(enemy32);
+
+                    let enemy33 = new Enemy(this, this.path1, 1500, 440 + 120 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                    this.enemies.add(enemy33);
+                });
+
+                this.time.delayedCall(7000, () =>
+                {
+                    let enemy34 = new Enemy(this, this.path1, 1500, 440 - 190 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                    this.enemies.add(enemy34);
+
+                    let enemy35 = new Enemy(this, this.path1, 1500, 440 + 190 + 30 * (-1) ** i, 'enemyBoat1', 'enemyProjectile', 0, 30000, 20, 30, 16000).setScale(3);
+                    this.enemies.add(enemy35);
+                });
+            }, [i]);
+        }
+
+        this.time.delayedCall(64000, () =>
+        {
+            let enemy36 = new Enemy(this, this.path2, 1400, 440 - 50, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 18000, 9000, 19000).setScale(3);
+            this.enemies.add(enemy36);
+
+            let enemy37 = new Enemy(this, this.path2, 1400, 440 + 50, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 18000, 9000, 19000).setScale(3);
+            this.enemies.add(enemy37);
+
+            this.time.delayedCall(1500, () =>
+            {
+                let enemy38 = new Enemy(this, this.path2, 1550, 440 - 140, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 19000, 9500, 19500).setScale(3);
+                this.enemies.add(enemy38);
+
+                let enemy39 = new Enemy(this, this.path2, 1550, 440 + 140, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 19000, 9500, 19500).setScale(3);
+                this.enemies.add(enemy39);
+            });
+
+            this.time.delayedCall(3000, () =>
+            {
+                let enemy40 = new Enemy(this, this.path2, 1700, 440 - 230, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 20000, 10000, 20000).setScale(3);
+                this.enemies.add(enemy40);
+
+                let enemy41 = new Enemy(this, this.path2, 1700, 440 + 230, 'enemyBoat2', 'enemyProjectile', 4, 2000, 20, 50, 20000, 10000, 20000).setScale(3);
+                this.enemies.add(enemy41);
+            });
+        });
+
+        this.time.delayedCall(84000, () =>
+        {
+            let enemy42 = new Enemy(this, this.path1, 1400, 440, 'enemySub', 'enemyProjectile', 0, 30000, 1000, 1000, 20000).setScale(12);
+            this.enemies.add(enemy42);
+        }, this);
     }
 
     // wave 3 function - incomplete

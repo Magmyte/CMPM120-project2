@@ -11,6 +11,7 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
         this.firePattern = firePattern;
         this.cooldown = attCooldown;
         this.lastAttack = this.scene.time.now;
+        this.shootAgain = true;
         this.hp = hp;
         this.score = score;
         this.pathDuration = pathDuration;
@@ -78,51 +79,65 @@ export class Enemy extends Phaser.GameObjects.PathFollower {
                     break;
                 case 1: // basic fire forward
                     this.fireProjectile(180, 250, 100, 5);
+                    this.lastAttack = time;
                     break;
                 case 2: // double fire
                     this.fireProjectile(180, 250, 100);
-                    this.scene.time.delayedCall(200, () =>
+                    if (this.shootAgain)
                     {
-                        this.fireProjectile(180, 250, 100);
-                        // this.enemyProjectileSound.play();
-                    }, this.scene);
+                        this.lastAttack = time - this.cooldown + 200;
+                        this.shootAgain = false;
+                    }
+                    else
+                    {
+                        this.lastAttack = time;
+                        this.shootAgain = true;
+                    }
                     break;
                 case 3: // v shot
                     this.fireProjectile(165, 250, 100);
                     this.fireProjectile(195, 250, 100);
+                    this.lastAttack = time;
                     break;
                 case 4: // v shot, double
                     this.fireProjectile(165, 250, 100);
                     this.fireProjectile(195, 250, 100);
-                    this.scene.time.delayedCall(200, () =>
+                    if (this.shootAgain)
                     {
-                        this.fireProjectile(165, 250, 100);
-                        this.fireProjectile(195, 250, 100);
-                        // this.enemyProjectileSound.play();
-                    }, this.scene);
+                        this.lastAttack = time - this.cooldown + 200;
+                        this.shootAgain = false;
+                    }
+                    else
+                    {
+                        this.lastAttack = time;
+                        this.shootAgain = true;
+                    }
                     break;
                 case 5: // tri shot
                     this.fireProjectile(165, 250, 100);
                     this.fireProjectile(180, 250, 100);
                     this.fireProjectile(195, 250, 100);
+                    this.lastAttack = time;
                     break;
                 case 6: // tri shot, double
                     this.fireProjectile(165, 250, 100);
                     this.fireProjectile(180, 250, 100);
                     this.fireProjectile(195, 250, 100);
-                    this.scene.time.delayedCall(200, () =>
+                    if (this.shootAgain)
                     {
-                        this.fireProjectile(165, 250, 100);
-                        this.fireProjectile(180, 250, 100);
-                        this.fireProjectile(195, 250, 100);
-                        // this.enemyProjectileSound.play();
-                    }, this.scene);
+                        this.lastAttack = time - this.cooldown + 200;
+                        this.shootAgain = false;
+                    }
+                    else
+                    {
+                        this.lastAttack = time;
+                        this.shootAgain = true;
+                    }
                     break;
                 default:
                     console.log("Oops, this enemy's projectile broke."); // debug
             }
             // this.enemyProjectileSound.play();
-            this.lastAttack = time;
         }
     }
 
