@@ -92,14 +92,14 @@ export class UIScene extends Phaser.Scene {
         this.clickSound = this.sound.add('clickSound');
         this.clickSound.setVolume(0.5);
 
-        this.restartButton.once('pointerdown', () =>
+        this.restartButton.on('pointerdown', () =>
         {
             this.restartButton.setTexture('startButtonPress');
             this.restartButton.tint = 0xf2cd3a;
             this.clickSound.play();
         });
 
-        this.restartButton.once('pointerup', () =>
+        this.restartButton.on('pointerup', () =>
         {
             this.hp = 5;
             for (var i = 0; i < this.hp; i++)
