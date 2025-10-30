@@ -443,6 +443,9 @@ export class Start extends Phaser.Scene {
 
         this.gameOver = false;
 
+        // clear pending timers
+        this.time.removeAllEvents();
+
         this.events.emit('scoreReset');
         this.waveStart1(98000); // length of first wave
         // this.waveStart2(102000); // testing purposes
@@ -457,6 +460,7 @@ export class Start extends Phaser.Scene {
         this.upPressed = 0;
         this.downPressed = 0;
         this.gameOver = true;
+        
         this.events.emit('gameOver');
     }
 

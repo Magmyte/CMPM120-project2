@@ -195,21 +195,6 @@ export class UIScene extends Phaser.Scene {
                 this.hp--;
                 this.hpBar[this.hp].setTexture('hpEmpty');
                 this.hpBar[this.hp].setScale(1);
-                if (this.hp <= 0)
-                {
-                    if (this.score > this.highScore)
-                    {
-                        this.highScore = this.score;
-                        this.highScoreText.setText('High Score: ' + this.highScore);
-                    }
-                    this.highScoreText.setVisible(true);
-
-                    this.gameOver = true;
-                    this.gameOverText.setVisible(true);
-                    this.restartButton.setVisible(true);
-                    this.restartText.setVisible(true);
-                    this.restartButton.setInteractive();
-                }
             }
         }, this);
 
@@ -243,6 +228,19 @@ export class UIScene extends Phaser.Scene {
 
             this.progressMarkFlag.pauseFollow();
             this.progressMarkCircle.pauseFollow();
+
+            if (this.score > this.highScore)
+            {
+                this.highScore = this.score;
+                this.highScoreText.setText('High Score: ' + this.highScore);
+            }
+            this.highScoreText.setVisible(true);
+
+            this.gameOver = true;
+            this.gameOverText.setVisible(true);
+            this.restartButton.setVisible(true);
+            this.restartText.setVisible(true);
+            this.restartButton.setInteractive();
         }, this);
 
         // game complete listener
